@@ -4,7 +4,7 @@ namespace Blog_API.Models
 {
     public class PostTags
     {
-        public int PostTagId { get; set; }
+        public int Id { get; set; }
         public int PostId { get; set; }
         public Post Post { get; set; }
         public int TagId { get; set; }

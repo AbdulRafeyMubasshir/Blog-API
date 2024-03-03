@@ -1,9 +1,17 @@
+using Blog_API.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Text;
 var builder = WebApplication.CreateBuilder(args);
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 23));
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
+builder.Services.AddDbContext<BlogContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Connection"), serverVersion));
 
 var app = builder.Build();
 
@@ -13,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.MapControllers();
 app.UseHttpsRedirection();
 
 var summaries = new[]

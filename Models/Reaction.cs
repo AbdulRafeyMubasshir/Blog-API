@@ -9,15 +9,6 @@ namespace Blog_API.Models
         public int PostId { get; set; }
         public Post Post { get; set; }
         public IdentityUser User { get; set; }
-        public ReactionType ReactionType { get; set; }
-    }
-    public enum ReactionType
-    {
-        Like,
-        Love,
-        Haha,
-        Wow,
-        Sad,
-        Angry
+        public String ReactionType { get; set; }
     }
 }
