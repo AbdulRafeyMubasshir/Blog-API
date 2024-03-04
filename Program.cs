@@ -1,4 +1,5 @@
 using Blog_API.Models;
+using Blog_API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Text;
@@ -13,7 +14,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<BlogContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Connection"), serverVersion));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<BlogContext>().AddDefaultTokenProviders();
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<EmailService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
