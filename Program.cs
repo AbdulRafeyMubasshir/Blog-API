@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<BlogContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Connection"), serverVersion));
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<BlogContext>().AddDefaultTokenProviders();
 
 var app = builder.Build();
 

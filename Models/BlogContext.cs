@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Blog_API.Models
 {
-    public class BlogContext : DbContext
+    public class BlogContext : IdentityDbContext<IdentityUser>
     {
         public BlogContext(DbContextOptions<BlogContext> options) : base(options)
         {
