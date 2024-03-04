@@ -300,3 +300,4 @@ C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\ne
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\MailKit.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\MimeKit.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
