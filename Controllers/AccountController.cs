@@ -87,6 +87,8 @@ namespace Blog_API.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 var roles = await _userManager.GetRolesAsync(user);
+                Console.WriteLine("Hereeeeeeeeeee");
+                Console.WriteLine(roles);
                 var token = GenerateJwtToken(user, roles);
 
                 return Ok(new { Token = token });

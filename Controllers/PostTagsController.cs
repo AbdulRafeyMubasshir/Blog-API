@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Blog_API.Models;
+using Microsoft.AspNetCore.Authorization;
+using Blog_API.DTO;
 
 namespace Blog_API.Controllers
 {
@@ -44,6 +46,7 @@ namespace Blog_API.Controllers
         // PUT: api/PostTags/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Author")]
         public async Task<IActionResult> PutPostTags(int id, PostTags postTags)
         {
             if (id != postTags.Id)
@@ -75,8 +78,18 @@ namespace Blog_API.Controllers
         // POST: api/PostTags
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PostTags>> PostPostTags(PostTags postTags)
-        {
+        [Authorize(Roles = "Admin,Author")]
+        public async Task<ActionResult<PostTags>> PostPostTags(PostTagDTO PostTagDTO)
+        {/////////////////////////////////eeeeeeeee
+            var post = await _context.Posts.FindAsync(PostTagDTO.PostId);
+            var tag = await _context.Tags.FindAsync(PostTagDTO.TagId);
+            var postTags = new PostTags{
+                Id = PostTagDTO.Id,
+                PostId = PostTagDTO.PostId,
+                TagId = PostTagDTO.TagId,
+                Post = post,
+                Tag = tag
+            };
             _context.PostTags.Add(postTags);
             await _context.SaveChangesAsync();
 
@@ -85,6 +98,7 @@ namespace Blog_API.Controllers
 
         // DELETE: api/PostTags/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Author")]
         public async Task<IActionResult> DeletePostTags(int id)
         {
             var postTags = await _context.PostTags.FindAsync(id);

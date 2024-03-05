@@ -6,6 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Blog_API.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using Blog_API.DTO;
+
+
 
 namespace Blog_API.Controllers
 {
@@ -14,44 +21,85 @@ namespace Blog_API.Controllers
     public class PostsController : ControllerBase
     {
         private readonly BlogContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public PostsController(BlogContext context)
+        public PostsController(BlogContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
+        public async Task<ActionResult<IEnumerable<PostResponseDTO>>> GetPosts()
         {
-            return await _context.Posts.ToListAsync();
+            //return await _context.Posts.ToListAsync();
+            //return await _context.Posts.Include(p => p.User).ToListAsync();
+            return await _context.Posts
+                .Include(p => p.User)
+                .Select(p => new PostResponseDTO
+                {
+                    // Include other Post properties if needed
+                    postId = p.PostId,
+                    title = p.Title,
+                    content = p.Content,
+                    // Only select the UserName property from the User
+                    author = p.User.UserName
+                })
+                .ToListAsync();
+
         }
 
         // GET: api/Posts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(int id)
+        public async Task<ActionResult<PostResponseDTO>> GetPost(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.PostId == id);
 
             if (post == null)
             {
                 return NotFound();
             }
 
-            return post;
+            // Project the result into a DTO
+    var postDto = new PostResponseDTO
+    {
+        // Include other Post properties if needed
+        postId = post.PostId,
+        title = post.Title,
+        content = post.Content,
+        // Only select the UserName property from the User
+        author = post.User.UserName
+    };
+
+    return Ok(postDto);
         }
 
         // PUT: api/Posts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post)
+        [Authorize(Roles = "Admin,Author")]
+        public async Task<IActionResult> PutPost(int id, PostRequestDTO post)
         {
-            if (id != post.PostId)
+            if (id != post.postId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(post).State = EntityState.Modified;
+            //_context.Entry(post).State = EntityState.Modified;
+            var postToUpdate = await _context.Posts.FindAsync(id);
+
+            if (postToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            // Map properties from DTO to entity
+            postToUpdate.Title = post.title;
+            postToUpdate.Content = post.content;
+
+            // Add additional mapping as needed
+
 
             try
             {
@@ -73,18 +121,48 @@ namespace Blog_API.Controllers
         }
 
         // POST: api/Posts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(Post post)
+        [Authorize(Roles = "Admin,Author")]
+        public async Task<ActionResult<PostResponseDTO>> PostPost(PostRequestDTO post)
         {
-            _context.Posts.Add(post);
+            // Get the user ID from the authentication token
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            // Decode the token
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            // Access email from the decoded token
+            var email = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+
+
+            // Create a new post with the provided data and associate it with the user
+            var newpost = new Post
+            {
+                PostId = post.postId,
+                User = null, 
+                Title = post.title,
+                Content = post.content
+            };
+            _context.Posts.Attach(newpost);
+            newpost.User = new IdentityUser { Id = user.Id }; // Create a new instance with the given user ID
+
+            _context.Posts.Add(newpost);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPost", new { id = post.PostId }, post);
+            return CreatedAtAction("GetPost", new { id = newpost.PostId }, new PostResponseDTO
+                                                                                {
+                                                                                postId = newpost.PostId,
+                                                                                title = newpost.Title,
+                                                                                content = newpost.Content,
+                                                                                author = newpost.User.UserName
+                                                                                });
         }
 
         // DELETE: api/Posts/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Author")]
         public async Task<IActionResult> DeletePost(int id)
         {
             var post = await _context.Posts.FindAsync(id);
@@ -99,6 +177,107 @@ namespace Blog_API.Controllers
             return NoContent();
         }
 
+        [HttpPost("{postId}/comments")]
+        [Authorize] // Add any necessary authorization attributes
+        public async Task<IActionResult> AddComment(int postId, CommentDTO comment)
+        {
+            // Retrieve the post
+            var post = await _context.Posts.FindAsync(postId);
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            // Decode the token
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            // Access UserId from the decoded token
+            var email = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+            if (post == null)
+            {
+                return NotFound("Post not found.");
+            }
+
+            // Set the PostId and UserId for the comment
+            var newcomment = new Comment {
+                CommentId = comment.CommentId,
+                Text = comment.Content,
+                PostId = postId,
+                Post = post
+            };
+            
+            _context.Comments.Attach(newcomment);
+            newcomment.User = new IdentityUser { Id = user.Id }; // Create a new instance with the given user ID
+
+            _context.Comments.Add(newcomment);
+            await _context.SaveChangesAsync();
+
+            return Ok("Comment added successfully.");
+        }
+        [HttpGet("/api/posts/{postId}/comments")]
+public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForPost(int postId)
+{
+    var comments = await _context.Comments.Include(c => c.Post) // Include the Post navigation property
+        .Include(c => c.User)
+        .Where(c => c.PostId == postId)
+        .ToListAsync();
+
+    if (comments == null || !comments.Any())
+    {
+        return NotFound("Comments not found for the specified post.");
+    }
+
+    return Ok(comments);
+}
+
+[HttpPost("{postId}/reactions")]
+        [Authorize] // Add any necessary authorization attributes
+        public async Task<IActionResult> AddReaction(int postId, ReactionDTO reaction)
+        {
+            // Retrieve the post
+            var post = await _context.Posts.FindAsync(postId);
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            // Decode the token
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            // Access UserId from the decoded token
+            var email = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
+            var user = await _userManager.FindByEmailAsync(email);
+            if (post == null)
+            {
+                return NotFound("Post not found.");
+            }
+
+            // Set the PostId and UserId for the comment
+            var newreaction = new Reaction {
+                ReactionId = reaction.ReactionId,
+                ReactionType = reaction.ReactionType,
+                PostId = postId,
+                Post = post
+            };
+            
+            _context.Reactions.Attach(newreaction);
+            newreaction.User = new IdentityUser { Id = user.Id }; // Create a new instance with the given user ID
+
+            _context.Reactions.Add(newreaction);
+            await _context.SaveChangesAsync();
+
+            return Ok("Reaction added successfully.");
+        }
+        [HttpGet("/api/posts/{postId}/reactions")]
+public async Task<ActionResult<IEnumerable<Reaction>>> GetReactionsForPost(int postId)
+{
+    var reactions = await _context.Reactions.Include(r => r.Post) // Include the Post navigation property
+        .Include(r => r.User)
+        .Where(r => r.PostId == postId)
+        .ToListAsync();
+
+    if (reactions == null || !reactions.Any())
+    {
+        return NotFound("Reactions not found for the specified post.");
+    }
+
+    return Ok(reactions);
+}
         private bool PostExists(int id)
         {
             return _context.Posts.Any(e => e.PostId == id);

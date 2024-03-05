@@ -7,12 +7,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blog_API.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+
 
 namespace Blog_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -81,7 +84,7 @@ namespace Blog_API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteRole(string roleId)
+        public async Task<IActionResult> DeleteRole([FromBody] string roleId)
         {
             var role = await _roleManager.FindByIdAsync(roleId);
 
@@ -99,11 +102,18 @@ namespace Blog_API.Controllers
 
             return BadRequest(result.Errors);
         }
+        [HttpPost("test")]
+        public async Task<IActionResult> test([FromBody] AssignRoleModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            Console.WriteLine(user);
+            return NotFound("User not found.");
+        }
 
         [HttpPost("assign-role-to-user")]
         public async Task<IActionResult> AssignRoleToUser([FromBody] AssignRoleModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
             {

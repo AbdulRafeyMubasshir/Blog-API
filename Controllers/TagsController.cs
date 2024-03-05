@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Blog_API.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blog_API.Controllers
 {
@@ -75,6 +76,7 @@ namespace Blog_API.Controllers
         // POST: api/Tags
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Admin,Author")]
         public async Task<ActionResult<Tag>> PostTag(Tag tag)
         {
             _context.Tags.Add(tag);
@@ -85,6 +87,7 @@ namespace Blog_API.Controllers
 
         // DELETE: api/Tags/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Author")]
         public async Task<IActionResult> DeleteTag(int id)
         {
             var tag = await _context.Tags.FindAsync(id);
@@ -99,6 +102,21 @@ namespace Blog_API.Controllers
             return NoContent();
         }
 
+[HttpGet("{id}/posts")]
+public async Task<ActionResult<IEnumerable<PostTags>>> GetPostsForTag(int id)
+{
+    var posttags = await _context.PostTags // Include the Post navigation property
+        .Include(p => p.Post)
+        .Include(p => p.Tag)
+        .Where(p => p.TagId == id)
+        .ToListAsync();
+    if (posttags == null || !posttags.Any())
+    {
+        //return NotFound("Posts not found for the specified tag.");
+    }
+
+    return Ok(posttags);
+}
         private bool TagExists(int id)
         {
             return _context.Tags.Any(e => e.TagId == id);
