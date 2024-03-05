@@ -13,7 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Blog_API.DTO;
 
 
-
+//"Connection": "Server=localhost;Database=Blog;User=root;Password=mysqlpassword;Persist Security Info=False;"
 namespace Blog_API.Controllers
 {
     [Route("api/[controller]")]
