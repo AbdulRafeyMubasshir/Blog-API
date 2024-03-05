@@ -45,6 +45,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.28, )"
+            },
             "MailKit": {
               "target": "Package",
               "version": "[4.4.0, )"
@@ -87,6 +91,10 @@
               "target": "Package",
               "version": "[8.0.1, )"
             },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.3.0, )"
+            },
             "MySql.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -94,6 +102,22 @@
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
               "version": "[8.0.1, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[8.0.1, )"
+            },
+            "Serilog.Settings.Configuration": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Serilog.Sinks.MSSqlServer": {
+              "target": "Package",
+              "version": "[6.6.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

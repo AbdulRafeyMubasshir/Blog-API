@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 23));
@@ -15,7 +16,7 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 23));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-
+//localhost;Database=Blog;User=root;Password=mysqlpassword;Persist Security Info=False;
 builder.Services.AddDbContext<BlogContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Connection"), serverVersion));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<BlogContext>().AddDefaultTokenProviders();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

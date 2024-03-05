@@ -22,6 +22,7 @@ namespace Blog_API.Controllers
     {
         private readonly BlogContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        //private readonly ILogger<PostsController> _logger;
 
         public PostsController(BlogContext context, UserManager<IdentityUser> userManager)
         {
@@ -33,20 +34,21 @@ namespace Blog_API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PostResponseDTO>>> GetPosts()
         {
-            //return await _context.Posts.ToListAsync();
-            //return await _context.Posts.Include(p => p.User).ToListAsync();
+            
             return await _context.Posts
                 .Include(p => p.User)
                 .Select(p => new PostResponseDTO
                 {
-                    // Include other Post properties if needed
+                    
                     postId = p.PostId,
                     title = p.Title,
                     content = p.Content,
-                    // Only select the UserName property from the User
+                    
                     author = p.User.UserName
                 })
                 .ToListAsync();
+                //_logger.LogInformation($"Posts retrieved successfully");
+
 
         }
 
@@ -62,17 +64,15 @@ namespace Blog_API.Controllers
             }
 
             // Project the result into a DTO
-    var postDto = new PostResponseDTO
-    {
-        // Include other Post properties if needed
-        postId = post.PostId,
-        title = post.Title,
-        content = post.Content,
-        // Only select the UserName property from the User
-        author = post.User.UserName
-    };
+            var postDto = new PostResponseDTO
+            {
+                postId = post.PostId,
+                title = post.Title,
+                content = post.Content,
+                author = post.User.UserName
+            };
 
-    return Ok(postDto);
+            return Ok(postDto);
         }
 
         // PUT: api/Posts/5
@@ -86,7 +86,7 @@ namespace Blog_API.Controllers
                 return BadRequest();
             }
 
-            //_context.Entry(post).State = EntityState.Modified;
+
             var postToUpdate = await _context.Posts.FindAsync(id);
 
             if (postToUpdate == null)
@@ -98,7 +98,7 @@ namespace Blog_API.Controllers
             postToUpdate.Title = post.title;
             postToUpdate.Content = post.content;
 
-            // Add additional mapping as needed
+            
 
 
             try
@@ -178,7 +178,7 @@ namespace Blog_API.Controllers
         }
 
         [HttpPost("{postId}/comments")]
-        [Authorize] // Add any necessary authorization attributes
+        [Authorize] 
         public async Task<IActionResult> AddComment(int postId, CommentDTO comment)
         {
             // Retrieve the post
@@ -188,7 +188,7 @@ namespace Blog_API.Controllers
             // Decode the token
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-            // Access UserId from the decoded token
+            // Access email from the decoded token
             var email = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
             var user = await _userManager.FindByEmailAsync(email);
             if (post == null)
@@ -212,24 +212,25 @@ namespace Blog_API.Controllers
 
             return Ok("Comment added successfully.");
         }
+
         [HttpGet("/api/posts/{postId}/comments")]
-public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForPost(int postId)
-{
-    var comments = await _context.Comments.Include(c => c.Post) // Include the Post navigation property
-        .Include(c => c.User)
-        .Where(c => c.PostId == postId)
-        .ToListAsync();
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForPost(int postId)
+        {
+            var comments = await _context.Comments.Include(c => c.Post) // Include the Post navigation property
+                .Include(c => c.User)
+                .Where(c => c.PostId == postId)
+                .ToListAsync();
 
-    if (comments == null || !comments.Any())
-    {
-        return NotFound("Comments not found for the specified post.");
-    }
+            if (comments == null || !comments.Any())
+            {
+                return NotFound("Comments not found for the specified post.");
+            }
 
-    return Ok(comments);
-}
+            return Ok(comments);
+        }
 
-[HttpPost("{postId}/reactions")]
-        [Authorize] // Add any necessary authorization attributes
+        [HttpPost("{postId}/reactions")]
+        [Authorize] 
         public async Task<IActionResult> AddReaction(int postId, ReactionDTO reaction)
         {
             // Retrieve the post
@@ -239,7 +240,7 @@ public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForPost(int pos
             // Decode the token
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-            // Access UserId from the decoded token
+            // Access email from the decoded token
             var email = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "sub")?.Value;
             var user = await _userManager.FindByEmailAsync(email);
             if (post == null)
@@ -263,21 +264,24 @@ public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForPost(int pos
 
             return Ok("Reaction added successfully.");
         }
+
+
         [HttpGet("/api/posts/{postId}/reactions")]
-public async Task<ActionResult<IEnumerable<Reaction>>> GetReactionsForPost(int postId)
-{
-    var reactions = await _context.Reactions.Include(r => r.Post) // Include the Post navigation property
-        .Include(r => r.User)
-        .Where(r => r.PostId == postId)
-        .ToListAsync();
+        public async Task<ActionResult<IEnumerable<Reaction>>> GetReactionsForPost(int postId)
+        {
+            var reactions = await _context.Reactions.Include(r => r.Post) // Include the Post navigation property
+                .Include(r => r.User)
+                .Where(r => r.PostId == postId)
+                .ToListAsync();
 
-    if (reactions == null || !reactions.Any())
-    {
-        return NotFound("Reactions not found for the specified post.");
-    }
+            if (reactions == null || !reactions.Any())
+            {
+                return NotFound("Reactions not found for the specified post.");
+            }
 
-    return Ok(reactions);
-}
+            return Ok(reactions);
+        }
+
         private bool PostExists(int id)
         {
             return _context.Posts.Any(e => e.PostId == id);

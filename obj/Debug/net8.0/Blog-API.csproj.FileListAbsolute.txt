@@ -301,3 +301,15 @@ C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\ne
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\MailKit.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\MimeKit.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Dapper.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.AspNetCore.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.File.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.MSSqlServer.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.PeriodicBatching.dll
