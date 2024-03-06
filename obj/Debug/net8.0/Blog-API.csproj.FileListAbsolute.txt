@@ -313,3 +313,8 @@ C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\ne
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.File.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.MSSqlServer.dll
 C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\Serilog.Sinks.PeriodicBatching.dll
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\publish\web.config
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\publish\Blog-API.deps.json
+C:\Users\dell\OneDrive\Documents\All Folders\FolderforCode\Blog-API\bin\Debug\net8.0\publish\Blog-API.runtimeconfig.json
